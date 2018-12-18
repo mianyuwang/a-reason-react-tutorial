@@ -1,4 +1,6 @@
 .merlin
+.vscode
+.bsb.lock
 lib
 node_modules
 public/bundle.js
