@@ -1,21 +1,26 @@
 {
   "name": "reason-to-do",
+  "description": "A REASON written to-do app",
+  "repository": {},
+  "license": "MIT",
   "scripts": {
     "js-watch": "bsb -make-world -w",
     "js": "bsb -make-world",
+    "clean": "bsb -clean-world",
     "build": "webpack -w",
     "dev": "webpack-dev-server --watch-content-base --open",
-    "clean": "bsb -clean-world"
+    "start": "concurrently \"npm run js-watch\" \"npm run dev\""
   },
   "dependencies": {
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "reason-react": "^0.3.4"
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "reason-react": "0.5.3"
   },
   "devDependencies": {
-    "bs-platform": "^2.2.3",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10"
+    "bs-platform": "^4.0.18",
+    "concurrently": "^4.1.0",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
   }
 }
