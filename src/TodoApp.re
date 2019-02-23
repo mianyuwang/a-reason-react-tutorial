@@ -6,9 +6,38 @@ type item = {
 
 let str = ReasonReact.string;
 
+let valueFromEvent = (evt) : string => (
+  evt
+  |> ReactEvent.Form.target
+)##value;
+
+module Input = {
+  type state = string;
+  let component = ReasonReact.reducerComponent("Input");
+  let make = (~onSubmit, _) => {
+    ...component,
+    initialState: () => "",
+    reducer: (newText, _text) => ReasonReact.Update(newText),
+    render: ({state: text, send}) =>
+      <input
+        value=text
+        type_="text"
+        placeholder="Write something to do"
+        onChange=((evt) => send(valueFromEvent(evt)))
+        onKeyDown=((evt) =>
+          if (ReactEvent.Keyboard.key(evt) == "Enter") {
+            onSubmit(text);
+            send("")
+          }
+        )
+      />
+  };
+};
+
+
 module TodoItem = {
   let component = ReasonReact.statelessComponent("TodoItem");
-  let make = (~item, ~onToggle, children) => {
+  let make = (~item, ~onToggle, _) => {
     ...component,
     render: (_) =>
       <div className="item">
@@ -30,15 +59,15 @@ type state = {
 };
 
 type action =
-  | AddItem
+  | AddItem(string)
   | ToggleItem(int);
 
 let component = ReasonReact.reducerComponent("TodoApp");
 
 let lastId = ref(0);
-let newItem = () => {
+let newItem = (text) => {
   lastId := lastId^ + 1;
-  {id: lastId^, title: "Click a button", completed: false}
+  {id: lastId^, title: text, completed: false}
 };
 
 let make = _children => {
@@ -51,9 +80,10 @@ let make = _children => {
       }
     ]
   },
-  reducer: (action, {items}) => switch action {
-    | AddItem =>
-      ReasonReact.Update({items: [newItem(), ...items]})
+  reducer: (action, {items}) =>
+    switch action {
+    | AddItem(text) =>
+      ReasonReact.Update({items: [newItem(text), ...items]})
     | ToggleItem(id) =>
       let items = List.map(
         (item) =>
@@ -66,10 +96,10 @@ let make = _children => {
   render: ({state: {items}, send}) => {
     let numItems = List.length(items);
     <div className="app">
-      <div className="title"> (str("What to do")) </div>
-      <button onClick=((_evt) => send(AddItem))>
-        (str("Add something"))
-      </button>
+      <div className="title">
+        (str("What to do"))
+        <Input onSubmit=((text) => send(AddItem(text))) />
+      </div>
       <div className="items">
         (List.map((item) => <TodoItem
           key=(string_of_int(item.id))
